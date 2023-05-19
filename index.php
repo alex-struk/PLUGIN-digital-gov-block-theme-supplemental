@@ -62,8 +62,8 @@ function vuejs_wordpress_block() {
         array( 'wp-blocks', 'wp-element', 'wp-editor' )
     );
 }
-
-add_action( 'enqueue_block_editor_assets', 'vuejs_wordpress_block' );
+add_action('wp_enqueue_scripts', 'custom_assets_loader');
+add_action('admin_enqueue_scripts', 'custom_assets_loader');
 
 // this loads vue app assets onto the client: todo: this happens for all pages, not just when the block is used
 function vuejs_app() {
