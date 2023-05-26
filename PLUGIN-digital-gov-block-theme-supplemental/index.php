@@ -54,9 +54,6 @@ function custom_assets_loader() {
 add_action('wp_enqueue_scripts', 'custom_assets_loader');
 add_action('admin_enqueue_scripts', 'custom_assets_loader');
 
-// TODO: refactor code into individual modules instead of a single file
-// VUE APP
-
 // Register block to load the Vue.js app
 function vuejs_wordpress_block() {
     wp_enqueue_script(
@@ -123,30 +120,3 @@ function vuejs_app_block_init() {
     ] );
 }
 add_action( 'init', 'vuejs_app_block_init' );
-
-
-
-
-
-// WCAG stuff
-
-function register_wcag_tags(){
-    register_taxonomy(
-        'wcag_tag',
-        'wcag',
-        array(
-            'label' =>  __('WCAG Tag'),
-            'show_in_rest' => true,
-            'public' => true,
-            'capabilities' => array(
-                'manage_terms' => 'manage_wcag_tags',
-                'edit_terms'   => 'edit_wcag_tags',
-                'delete_terms' => 'delete_wcag_tags',
-                'assign_terms' => 'assign_wcag_tags',
-            )
-        )
-    );
-}
-
-
-add_action( 'init', 'register_wcag_tags', 0 );

@@ -41,8 +41,8 @@
                 class="wp-elements-ebf6029de9e8cfc5d6fe4a760bc46921 is-acf-field wp-block-mfb-meta-field-block"><span
                   class="value">{{ post.acf.description.value }}</span></p>
 
-              <div v-if="post.wcag_tag" class="taxonomy-common_component_category wp-block-post-terms wcag-card-tags">
-                <span v-for="tag in post.wcag_tag" :key="tag" class="tag">{{ tag }}</span>
+              <div class="taxonomy-common_component_category wp-block-post-terms wcag-card-tags">
+                <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
               </div>
             </div>
           </a>
@@ -77,32 +77,23 @@
       },
 
       uniqueTags() {
-        let uniqueT = [...new Set(this.posts.flatMap(post => post.wcag_tag || []))];
-        console.log('uniqueTags: ', uniqueT);
-        return uniqueT;
+        return [...new Set(this.posts.flatMap(post => post.tags))];
       },
 
       filteredPosts() {
-        // let posts = this.posts;
+        let posts = this.posts;
 
-        // // If tags are selected, filter posts
-        // if (this.selectedTags.length > 0) {
-        //   posts = posts.filter(post =>
-        //     this.selectedTags.every(tag => post.tags.includes(tag))
-        //   );
-        // }
-
-        // // Sort posts by title
-        // posts.sort((a, b) => a.title.rendered.localeCompare(b.title.rendered));
-
-        // return posts;
-        if (!this.selectedTags.length) {
-            return this.posts;
-        } else {
-            return this.posts.filter(post => {
-                return post.wcag_tag && post.wcag_tag.length && this.selectedTags.every(tag => post.wcag_tag.includes(tag));
-            });
+        // If tags are selected, filter posts
+        if (this.selectedTags.length > 0) {
+          posts = posts.filter(post =>
+            this.selectedTags.every(tag => post.tags.includes(tag))
+          );
         }
+
+        // Sort posts by title
+        posts.sort((a, b) => a.title.rendered.localeCompare(b.title.rendered));
+
+        return posts;
       },
     },
 
@@ -125,11 +116,9 @@
             throw new Error("An error has occurred: " + response.status);
           }
           let posts = await response.json();
-          
+
           // Get the unique URLs for fetching tags
           const tagUrls = [...new Set(posts.flatMap(post => post._links['wp:term'].map(link => link.href)))];
-
-          console.log('tagUrls: ', tagUrls);
 
           // Fetch tags from each unique URL and store the response
           let tags = {};
@@ -143,19 +132,13 @@
               });
             }
           }
-          
-          console.log('tags: ', tags);
 
           // Replace tag ids with tag names in posts
           posts.forEach(post => {
-              console.log('processing post/post.wcag_tag: ', post, post.wcag_tag)
-              post.wcag_tag = post.wcag_tag ? post.wcag_tag.map(tagId => tags[tagId] || tagId) : [];
+            post.tags = post.tags.map(tagId => tags[tagId] || tagId);
           });
 
           this.posts = posts;
-
-          console.log('setting this.posts: ', this.posts);
-
         } catch (error) {
           console.log(error);
         }
